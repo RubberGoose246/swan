@@ -108,11 +108,7 @@ void MatmulFPGA(Tensor1d& out, const Tensor1d& in, const Tensor2dAttn& w,
   for (int i = 0; i < kDim; i++) {
     ptr_a[i] = in[i];
   }
-  for (int i = 0; i < kDim; i++) {
-    for (int j = 0; j < kDim; j++) {
-      ptr_b[i * kDim + j] = w[i][j];
-    }
-  }
+  memcpy(ptr_b, w, kDim * kDim * sizeof(float));
   q.enqueueMigrateMemObjects({buffer_a, buffer_b}, 0);
   kernel_matmul.setArg(3, kDim);
   kernel_matmul.setArg(4, kDim);
@@ -134,11 +130,7 @@ void MatmulFPGA(Tensor1dFFNB& out, const Tensor1d& in, const Tensor2dFFNA& w,
   for (int i = 0; i < kDim; i++) {
     ptr_a[i] = in[i];
   }
-  for (int i = 0; i < kFFNDim; i++) {
-    for (int j = 0; j < kDim; j++) {
-      ptr_b[i * kDim + j] = w[i][j];
-    }
-  }
+  memcpy(ptr_b, w, kFFNDim * kDim * sizeof(float));
   q.enqueueMigrateMemObjects({buffer_a, buffer_b}, 0);
   kernel_matmul.setArg(3, kDim);
   kernel_matmul.setArg(4, kFFNDim);
@@ -160,11 +152,7 @@ void MatmulFPGA(Tensor1d& out, const Tensor1dFFNB& in, const Tensor2dFFNB& w,
   for (int i = 0; i < kFFNDim; i++) {
     ptr_a[i] = in[i];
   }
-  for (int i = 0; i < kDim; i++) {
-    for (int j = 0; j < kFFNDim; j++) {
-      ptr_b[i * kFFNDim + j] = w[i][j];
-    }
-  }
+  memcpy(ptr_b, w, kDim * kFFNDim * sizeof(float));
   q.enqueueMigrateMemObjects({buffer_a, buffer_b}, 0);
   kernel_matmul.setArg(3, kFFNDim);
   kernel_matmul.setArg(4, kDim);
